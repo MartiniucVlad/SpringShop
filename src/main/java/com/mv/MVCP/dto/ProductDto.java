@@ -5,15 +5,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 @Builder
+@Getter
+@Setter
 public class ProductDto {
 
     private Long  id;
@@ -27,12 +27,6 @@ public class ProductDto {
     private UserEntity createdBy;
 
 
-
-
-
-    public ProductDto() {};
-
-
     @Override
     public String toString() {
         return "ProductDto{" +
@@ -40,40 +34,5 @@ public class ProductDto {
                 ", photoUrl='" + photoUrl + '\'' +
                 ", content='" + content + '\'' +
                 '}';
-    }
-
-
-
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getPhotoUrl() {
-        return photoUrl;
-    }
-
-    public void setPhotoUrl(String photoUrl) {
-        this.photoUrl = photoUrl;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
     }
 }
