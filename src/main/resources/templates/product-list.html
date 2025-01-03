@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Modern Business - Start Bootstrap Template</title>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link th:href="@{/css/styles.css}" rel="stylesheet" />
+</head>
+<body class="d-flex flex-column h-100">
+<main class="flex-shrink-0">
+    <!-- Navigation-->
+
+    <!-- Page Content-->
+    <section layout:fragment="body" class="py-5">
+        <div class="container px-5 my-5">
+            <div th:if="${param.success}" class="alert alert-success">
+                You are registered successfully!
+            </div>
+            <div>
+                <form th:action="@{/products/search}" class="form-inline my-2 my-lg-0 mb-3">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search products" aria-label="Search" name="query">
+                </form>
+            </div>
+            <div th:each="product:${products}">
+                <img th:src="${product.getPhotoUrl()}" style="max-width: 400px; max-height: 300px;">
+                <a th:text="${product.title}"></a>
+                <i class="bi bi-alarm"></i> <!-- Example for an alarm icon -->
+                <i class="bi bi-house"></i> <!-- Example for a house icon -->
+                <a th:href="@{/products/{id}(id=${product.id})}" class="btn btn-primary">View</a>
+                <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-primary">Edit</a>
+                <a th:href="@{/products/delete/{id}(id=${product.id})}" class="btn btn-primary">Delete</a>
+            </div>
+
+        </div>
+    </section>
+</main>
+</body>
+</html>
