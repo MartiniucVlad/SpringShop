@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"  xmlns:th="http://www.thymeleaf.org"
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
 <head>
     <meta charset="utf-8" />
@@ -13,6 +13,43 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
     <!-- Core theme CSS (includes Bootstrap)-->
     <link th:href="@{/css/styles.css}" rel="stylesheet" />
+    <!-- Add your custom styles -->
+    <style>
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            background-color: #f8f9fa;
+            transition: transform 0.3s ease;
+        }
+        .product-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .product-img {
+            max-width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .product-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #343a40;
+            margin-top: 12px;
+        }
+        .btn-custom {
+            background-color: #007bff;
+            color: #fff;
+            transition: background-color 0.3s ease;
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+        .alert {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body class="d-flex flex-column h-100">
 <main class="flex-shrink-0">
@@ -25,20 +62,24 @@
                 You are registered successfully!
             </div>
             <div>
-                <form th:action="@{/products/search}" class="form-inline my-2 my-lg-0 mb-3">
+                <form th:action="@{/products/search}" class="form-inline my-2 my-lg-0 mb-4">
                     <input class="form-control mr-sm-2" type="search" placeholder="Search products" aria-label="Search" name="query">
                 </form>
             </div>
-            <div th:each="product:${products}">
-                <img th:src="${product.getPhotoUrl()}" style="max-width: 400px; max-height: 300px;">
-                <a th:text="${product.title}"></a>
-                <i class="bi bi-alarm"></i> <!-- Example for an alarm icon -->
-                <i class="bi bi-house"></i> <!-- Example for a house icon -->
-                <a th:href="@{/products/{id}(id=${product.id})}" class="btn btn-primary">View</a>
-                <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-primary">Edit</a>
-                <a th:href="@{/products/delete/{id}(id=${product.id})}" class="btn btn-primary">Delete</a>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                <div th:each="product:${products}" class="col">
+                    <div class="product-card">
+                        <img th:src="${product.getPhotoUrl()}" class="product-img" alt="Product Image">
+                        <h5 th:text="${product.title}" class="product-title"></h5>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <a th:href="@{/products/{id}(id=${product.id})}" class="btn btn-custom btn-sm">View</a>
+                            <div th:if="${user.id} == ${product.createdBy.id}">
+                                <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-custom btn-sm">Edit</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-
         </div>
     </section>
 </main>

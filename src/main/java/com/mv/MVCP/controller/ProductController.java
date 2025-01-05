@@ -1,8 +1,11 @@
 package com.mv.MVCP.controller;
 
 import com.mv.MVCP.Service.ProductService;
+import com.mv.MVCP.Service.UserService;
 import com.mv.MVCP.dto.ProductDto;
 import com.mv.MVCP.models.Product;
+import com.mv.MVCP.models.UserEntity;
+import com.mv.MVCP.security.SecurityUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,17 +21,27 @@ import java.util.List;
 public class ProductController {
     @Autowired
     private ProductService productService;
+    @Autowired
+    private UserService userService;
 
-
+    public void addUserToModel (Model model) {
+        UserEntity user = new UserEntity();
+        String username = SecurityUtil.getSessionUser();
+        if(username != null) {
+            user = userService.findByUser(username);
+        }
+        model.addAttribute("user", user);
+    }
 
     @GetMapping("/products")
     public String products(Model model) {
+
         List<ProductDto> products = productService.findAll();
         model.addAttribute("products", products);
-        //
-      //  Product testProd = new Product("Test Product", "https://pl.nice-cdn.com/upload/image/product/large/default/toy-place-bear-100cm-1-st-819856-en.jpg", "This is a test product");
+        addUserToModel(model);
+      // Product testProd = new Product("Test Product", "https://pl.nice-cdn.com/upload/image/product/large/default/toy-place-bear-100cm-1-st-819856-en.jpg", "This is a test product");
        // productService.insertProduct(testProd);
-        //
+
         return "product-list";
     }
 
@@ -40,6 +53,7 @@ public class ProductController {
             return "redirect:/products";
         }
         model.addAttribute("product", productDto);
+        addUserToModel(model);
         return "product-details";
     }
 

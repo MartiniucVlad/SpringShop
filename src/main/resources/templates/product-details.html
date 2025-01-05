@@ -1,38 +1,115 @@
 <!DOCTYPE html>
-<html lang="en"  xmlns:th="http://www.thymeleaf.org"
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>Modern Business - Start Bootstrap Template</title>
+    <title>Product Overview</title>
     <!-- Favicon-->
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
     <!-- Bootstrap icons-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
     <!-- Core theme CSS (includes Bootstrap)-->
     <link th:href="@{/css/styles.css}" rel="stylesheet" />
+    <!-- Custom styles -->
+    <style>
+        body {
+            background-color: #f7f7f7;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .product-image {
+            max-width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-details {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .small {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .fw-bolder {
+            color: #333;
+            font-weight: 700;
+        }
+
+        .display-5 {
+            font-size: 2.5rem;
+        }
+
+        .fs-5 {
+            font-size: 1.25rem;
+        }
+
+        .text-decoration-line-through {
+            color: #bbb;
+        }
+
+        .btn-outline-dark {
+            border-radius: 4px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .btn-outline-dark:hover {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .form-control {
+            border-radius: 4px;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        .delete-link {
+            margin-top: 20px;
+            display: inline-block;
+            color: #d9534f;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .delete-link:hover {
+            color: #c9302c;
+        }
+    </style>
 </head>
 <body class="d-flex flex-column h-100">
 <main class="flex-shrink-0">
-
-
     <section layout:fragment="body" class="py-5">
-        <section class="py-5">
-            <div class="container px-4 px-lg-5 my-5">
-                <div class="row gx-4 gx-lg-5 align-items-center">
-                    <div class="col-md-6"><img style="max-width: 800px; max-height: 600px" th:src="${product.photoUrl}" alt="..." /></div>
-                    <div class="col-md-6">
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="row gx-4 gx-lg-5 align-items-center">
+                <!-- Product Image -->
+                <div class="col-md-6">
+                    <img class="product-image" th:src="${product.photoUrl}" alt="Product Image" />
+                </div>
+
+                <!-- Product Details -->
+                <div class="col-md-6">
+                    <div class="product-details">
                         <div class="small mb-1">SKU: BST-498</div>
                         <h1 class="display-5 fw-bolder" th:text="${product.title}"></h1>
-                        <div class="fs-5 mb-5">
+                        <div class="fs-5 mb-4">
                             <span class="text-decoration-line-through">$45.00</span>
                             <span>$40.00</span>
                         </div>
-                        <p class="lead" th:text="${product.content}"> </p>
-                        <div class="d-flex">
-                            <input class="form-control text-center me-3" id="inputQuantity" type="num" value="1" style="max-width: 3rem" />
+                        <p class="lead mb-4" th:text="${product.content}"></p>
+                        <div class="d-flex align-items-center">
+                            <input class="form-control me-3" id="inputQuantity" type="num" value="1" />
                             <button class="btn btn-outline-dark flex-shrink-0" type="button">
                                 <i class="bi-cart-fill me-1"></i>
                                 Add to cart
@@ -41,7 +118,12 @@
                     </div>
                 </div>
             </div>
-        </section>
+
+            <!-- Delete Product Link -->
+            <div class="text-center mt-4" th:if="${user.id} == ${product.createdBy.id}">
+                <a th:href="@{/products/delete/{id}(id=${product.id})}" class="delete-link">Delete product</a>
+            </div>
+        </div>
     </section>
 </main>
 </body>
