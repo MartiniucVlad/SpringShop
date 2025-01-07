@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-@Registered
+
 public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findByTitle(String title);
 

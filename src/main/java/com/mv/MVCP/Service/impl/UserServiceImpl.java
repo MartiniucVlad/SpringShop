@@ -43,7 +43,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByUsername(user);
     }
 
-
+    @Override
+    public void changeStatus(UserEntity user, String type) {
+       user.setStatusType(type);
+       userRepository.save(user);
+    }
 
 
 }

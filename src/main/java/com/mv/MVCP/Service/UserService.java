@@ -6,7 +6,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface UserService {
+
+
     void saveUser(RegistrationDto registrationDto);
     UserEntity findByEmail(String email);
     UserEntity findByUser(String user);
+
+    void changeStatus(UserEntity user, String type);
+
 }

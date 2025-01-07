@@ -24,6 +24,13 @@ public class ProductController {
     @Autowired
     private UserService userService;
 
+
+    @GetMapping("/test")
+    public String test() {
+        return "test";
+    }
+
+
     public void addUserToModel (Model model) {
         UserEntity user = new UserEntity();
         String username = SecurityUtil.getSessionUser();
