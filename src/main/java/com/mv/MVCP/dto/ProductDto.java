@@ -16,7 +16,7 @@ import java.util.List;
 @Setter
 public class ProductDto {
 
-    private Long  id;
+    Long id;
 
     @NotEmpty(message = "Title is required")
     private String title;

@@ -1,7 +1,22 @@
-/*!
-* Start Bootstrap - Modern Business v5.0.7 (https://startbootstrap.com/template-overviews/modern-business)
-* Copyright 2013-2023 Start Bootstrap
-* Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-modern-business/blob/master/LICENSE)
-*/
-// This file is intentionally blank
-// Use this file to add JavaScript to your project
+
+function sendPost(url, statusType) {
+
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+
+        }
+    })
+        .then(response => {
+            if (response.ok) {
+                document.getElementById('user-status').textContent = `Status: ${statusType}`;
+                console.log('Status updated successfully!');
+            } else {
+                console.error('Error updating status.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+

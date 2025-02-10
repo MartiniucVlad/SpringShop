@@ -4,13 +4,15 @@ import com.mv.MVCP.models.UserEntity;
 import com.mv.MVCP.repository.UserRepository;
 import com.mv.MVCP.webSocket.chatDomain.ChatMessage;
 import com.mv.MVCP.webSocket.chatDomain.ChatRoom;
+import com.mv.MVCP.webSocket.chatDomain.ChatRoomType;
+import com.mv.MVCP.webSocket.chatDomain.dto.ChatMessageDto;
 import com.mv.MVCP.webSocket.chatRepositories.ChatMessageRepository;
 import com.mv.MVCP.webSocket.chatRepositories.ChatRoomRepository;
 import com.mv.MVCP.webSocket.chatServices.ChatRoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,8 +27,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private UserRepository userRepository;
 
 
+
+
     @Override
-    public ChatRoom getChatRoom(Long id1, Long id2) {
+    public ChatRoom getChatRoomByUserIds(Long id1, Long id2) {
         Optional<UserEntity> u1 = userRepository.findById(id1);
         Optional<UserEntity> u2 = userRepository.findById(id2);
         if (u1.isEmpty() || u2.isEmpty()) {
@@ -59,8 +63,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public void addMessage(ChatMessage message) {
-        chatMessageRepository.save(message);
+    public void saveMessage(ChatMessageDto messageDto) {
+
+        ChatMessage message = toMessage(messageDto);
+       chatMessageRepository.save(message);
     }
 
     @Override
@@ -72,8 +78,28 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         return chatRoomRepository.findAllByUser1OrUser2(user, user);
     }
 
-    @GetMapping("/chat")
-    public String chat() {
-        return "chat";
+    @Override
+    public ChatRoom getPublicChatRoom() {
+        return chatRoomRepository.findAllByType(ChatRoomType.PUBLIC).stream().findFirst().orElse(null);
+    }
+
+    ChatMessage toMessage(ChatMessageDto chatMessageDto) {
+        UserEntity user = userRepository.findById(chatMessageDto.getSenderId()).orElse(null);
+        if (user == null) {
+            throw new RuntimeException("User not found with ID: " + chatMessageDto.getSenderId());
+        }
+
+        ChatRoom chatRoom = chatRoomRepository.findById(chatMessageDto.getChatRoomId()).orElse(null);
+        if (chatRoom == null) {
+            throw new RuntimeException("ChatRoom not found with ID: " + chatMessageDto.getChatRoomId());
+        }
+
+        ChatMessage chatMessage = ChatMessage.builder()
+                .content(chatMessageDto.getContent())
+                .timestamp(LocalDateTime.now())
+                .sender(user)
+                .chatRoom(chatRoom)
+                .build();
+        return chatMessage;
     }
 }

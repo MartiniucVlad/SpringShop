@@ -35,6 +35,10 @@
     /* Remove blue color from anchor links */
 }
 
+.not-clickable {
+    pointer-events: none;
+}
+
 </style>
 
 
@@ -47,6 +51,8 @@
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link" th:href="@{/products}">Homepage</a></li>
                     <li class="nav-item"><a class="nav-link" th:href="@{/products/create}">Create product</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/public-chat}">Public Chat</a></li>
+
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" id="navbarDropdownBlog" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Blog</a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownBlog">
@@ -62,6 +68,8 @@
                             <!-- First Level Dropdown Items -->
                             <li th:unless="${user}" ><a class="dropdown-item" th:href="@{/register}">Register</a></li>
                             <li th:unless="${user}"  ><a class="dropdown-item" th:href="@{/login}">Login</a></li>
+                            <li th:if="${user}"  ><a class="dropdown-item not-clickable" th:text="${user.username} "></a></li>
+
                             <li th:if="${user}" class="dropdown-submenu parent">
                                 <a id="user-status" class="dropdown-item" th:text="'Status: ' + ${user.statusType}" href="#"></a>
                                 <ul class="dropdown-menu child">
@@ -107,35 +115,12 @@
         </div>
     </div>
 
-    <div th:replace="~{chat-window :: chatWindow}"></div>
 </footer>
 <!-- Bootstrap core JS-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Core theme JS-->
 <script th:src="@{/js/scripts.js}"></script>
 
-<script>
-    function sendPost(url, statusType) {
 
-
-     fetch(url, {
-         method: 'POST',
-         headers: {
-             'Content-Type': 'application/json',
-
-         }
-     })
-     .then(response => {
-         if (response.ok) {
-             document.getElementById('user-status').textContent = `Status: ${statusType}`;
-             console.log('Status updated successfully!');
-         } else {
-             console.error('Error updating status.');
-         }
-     })
-     .catch(error => console.error('Error:', error));
- }
-
-</script>
 
 </html>

@@ -31,21 +31,13 @@ public class ProductController {
     }
 
 
-    public void addUserToModel (Model model) {
-        UserEntity user = new UserEntity();
-        String username = SecurityUtil.getSessionUser();
-        if(username != null) {
-            user = userService.findByUser(username);
-        }
-        model.addAttribute("user", user);
-    }
 
     @GetMapping("/products")
     public String products(Model model) {
 
         List<ProductDto> products = productService.findAll();
         model.addAttribute("products", products);
-        addUserToModel(model);
+
       // Product testProd = new Product("Test Product", "https://pl.nice-cdn.com/upload/image/product/large/default/toy-place-bear-100cm-1-st-819856-en.jpg", "This is a test product");
        // productService.insertProduct(testProd);
 
@@ -60,7 +52,6 @@ public class ProductController {
             return "redirect:/products";
         }
         model.addAttribute("product", productDto);
-        addUserToModel(model);
         return "product-details";
     }
 

@@ -77,7 +77,6 @@ public class ProductServiceImpl implements ProductService {
 
     private Product toProduct(ProductDto productDto) {
         Product product = Product.builder()
-                .id(productDto.getId())
                 .title(productDto.getTitle())
                 .photoUrl(productDto.getPhotoUrl())
                 .content(productDto.getContent())
