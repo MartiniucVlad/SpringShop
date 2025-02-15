@@ -4,14 +4,21 @@ import com.mv.MVCP.dto.RegistrationDto;
 import com.mv.MVCP.models.UserEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public interface UserService {
 
 
     void saveUser(RegistrationDto registrationDto);
     UserEntity findByEmail(String email);
-    UserEntity findByUser(String user);
+    UserEntity findByUsername(String user);
 
     void changeStatus(UserEntity user, String type);
 
+    List<UserEntity> getFriendList(UserEntity user);
+
+    void addFriend(Long userId1, Long userId2);
+
+    void removeFriend(Long userId1, Long userId2);
 }

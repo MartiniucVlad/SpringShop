@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ChatRoomServiceImpl implements ChatRoomService {
@@ -31,35 +33,51 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Override
     public ChatRoom getChatRoomByUserIds(Long id1, Long id2) {
-        Optional<UserEntity> u1 = userRepository.findById(id1);
-        Optional<UserEntity> u2 = userRepository.findById(id2);
-        if (u1.isEmpty() || u2.isEmpty()) {
+        Optional<UserEntity> u1o = userRepository.findById(id1);
+        Optional<UserEntity> u2o = userRepository.findById(id2);
+        if (u1o.isEmpty() || u2o.isEmpty()) {
             return null;
         }
+        UserEntity user1 = u1o.get();
+        UserEntity user2 = u2o.get();
 
-        ChatRoom room = chatRoomRepository.findByUser1AndUser2(u1.get(), u2.get());
+        if(user1.getId() > user2.getId()) {
+            UserEntity temp = user1;
+            user1 = user2;
+            user2 = temp;
+        }
+
+        ChatRoom room = chatRoomRepository.findByUser1AndUser2(user1, user2);
         if (room == null) {
-            return createChatRoom(u1.get(), u2.get());
+            return createChatRoom(user1, user2);
         }
         return room;
     }
 
 
+    // user1.id must already be > than user2.id
     @Override
     public ChatRoom createChatRoom(UserEntity user1, UserEntity user2) {
         ChatRoom room = new ChatRoom();
         room.setUser1(user1);
         room.setUser2(user2);
+        room.setType(ChatRoomType.PRIVATE);
         return chatRoomRepository.save(room);
     }
 
     @Override
-    public List<ChatMessage> getMessages(Long roomId) {
+    public List<ChatMessageDto> getMessages(Long roomId) {
         ChatRoom room = chatRoomRepository.findById(roomId).orElse(null);
         if (room == null) {
             return null;
         }
-        return chatMessageRepository.findAllByChatRoom(room);
+        return chatMessageRepository.findAllByChatRoom(room).stream().map(message -> ChatMessageDto.builder()
+                .content(message.getContent())
+                .senderId(message.getSender().getId())
+                .senderName(message.getSender().getUsername())
+                .chatRoomId(roomId)
+                .timestamp(message.getTimestamp().format(ChatMessageDto.formatter))
+                .build()).toList();
     }
 
     @Override
@@ -70,12 +88,14 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public List<ChatRoom> getUserChatRooms(Long id) {
-        UserEntity user = userRepository.findById(id).orElse(null);
-        if (user == null) {
-            return null;
-        }
-        return chatRoomRepository.findAllByUser1OrUser2(user, user);
+    public Map<Long, Long> getFriendChatRooms(Long userId) {
+        UserEntity user = userRepository.findById(userId).orElse(null);
+        List<ChatRoom> chatRooms = chatRoomRepository.findAllByUser1OrUser2(user, user);
+        return chatRooms.stream()
+                .collect(Collectors.toMap(
+                        room -> room.getUser1().getId().equals(userId) ? room.getUser2().getId() : room.getUser1().getId(),
+                        ChatRoom::getId
+                ));
     }
 
     @Override
@@ -96,7 +116,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         ChatMessage chatMessage = ChatMessage.builder()
                 .content(chatMessageDto.getContent())
-                .timestamp(LocalDateTime.now())
+                .timestamp(LocalDateTime.parse(chatMessageDto.getTimestamp(), ChatMessageDto.formatter))
                 .sender(user)
                 .chatRoom(chatRoom)
                 .build();

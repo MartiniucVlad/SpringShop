@@ -26,7 +26,7 @@ public class AuthController {
         UserEntity user = new UserEntity();
         String username = SecurityUtil.getSessionUser();
         if(username != null) {
-            user = userService.findByUser(username);
+            user = userService.findByUsername(username);
             return user;
         }
         return null;
@@ -48,7 +48,7 @@ public class AuthController {
         if(existingUserEmail != null) {
             return "redirect:/register?takenEmail";
         }
-        UserEntity existingUserUsername = userService.findByUser(registrationDto.getUsername());
+        UserEntity existingUserUsername = userService.findByUsername(registrationDto.getUsername());
         if(existingUserUsername != null) {
             return "redirect:/register?takenUser";
         }

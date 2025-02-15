@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Automatically connect to the WebSocket when the page loads
     connect();
+    loadMessages()
+
 
     // Event Listener for the Send Button
     sendButton.addEventListener("click", function (event) {
@@ -62,10 +64,27 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    function loadMessages() {
+        console.log("Loading messages");
+        console.log("publicMessages:", publicMessages);
+        publicMessages.forEach(function(message) {
+            console.log("Message:", message);
+            showMessage(message);
+        });
+    }
+
+
     // Display Received Message in the Table
     function showMessage(message) {
+
         let newRow = messagesTable.insertRow();
         let cell = newRow.insertCell(0);
+
+        if(userId == message.senderId){
+            // message is green
+            cell.style.backgroundColor = "lightgreen"; // You can change this to any color
+            cell.style.fontWeight = "bold"; // Optional: make the font bold
+        }
         cell.innerText = `[${message.timestamp}] ${message.senderName}: ${message.content}`;
     }
 });

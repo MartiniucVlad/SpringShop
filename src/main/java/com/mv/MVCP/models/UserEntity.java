@@ -2,7 +2,6 @@ package com.mv.MVCP.models;
 
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,6 +32,16 @@ public class UserEntity {
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
     )
     private List<RoleEntity> roles = new ArrayList<>();
+
+
+    // only friends with a greater id are stored, needs querying the user_id2 too for complete friend list
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "user_friends",
+            joinColumns = @JoinColumn(name = "user_id1", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id2", referencedColumnName = "id")
+    )
+    private List<UserEntity> partialFriendList = new ArrayList<>();
 
     public void addRole(RoleEntity role) {
         roles.add(role);

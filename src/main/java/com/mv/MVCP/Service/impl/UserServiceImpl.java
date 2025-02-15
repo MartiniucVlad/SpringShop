@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
@@ -39,7 +41,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserEntity findByUser(String user) {
+    public UserEntity findByUsername(String user) {
         return userRepository.findByUsername(user);
     }
 
@@ -48,6 +50,49 @@ public class UserServiceImpl implements UserService {
        user.setStatusType(type);
        userRepository.save(user);
     }
+
+    @Override
+    public List<UserEntity> getFriendList(UserEntity user) {
+        return userRepository.findFullFriendList(user.getId());
+    }
+
+    @Override
+    public void addFriend(Long userId1, Long userId2) {
+        UserEntity user1 = userRepository.findById(userId1).orElse(null);
+        UserEntity user2 = userRepository.findById(userId2).orElse(null);
+        if(user1 ==  null || user2 == null)
+                return;
+        if(user1.getId() > user2.getId()) {
+            UserEntity temp = user1;
+            user1 = user2;
+            user2 = temp;
+        }
+        if (user1.getPartialFriendList().contains(user2)) {
+           return;
+        }
+
+        user1.getPartialFriendList().add(user2);
+        userRepository.save(user1);
+    }
+
+    @Override
+    public void removeFriend(Long userId1, Long userId2) {
+        UserEntity user1 = userRepository.findById(userId1).orElse(null);
+        UserEntity user2 = userRepository.findById(userId2).orElse(null);
+
+        if(user1 ==  null || user2 == null)
+            return;
+        if(user1.getId() > user2.getId()) {
+            UserEntity temp = user1;
+            user1 = user2;
+            user2 = temp;
+        }
+
+        user1.getPartialFriendList().remove(user2);
+        userRepository.save(user1);
+    }
+
+
 
 
 }

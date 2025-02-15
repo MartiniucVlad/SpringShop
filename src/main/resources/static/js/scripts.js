@@ -1,7 +1,10 @@
+document.addEventListener("DOMContentLoaded", function () {
+
+
+});
+
 
 function sendPost(url, statusType) {
-
-
     fetch(url, {
         method: 'POST',
         headers: {
@@ -19,4 +22,3 @@ function sendPost(url, statusType) {
         })
         .catch(error => console.error('Error:', error));
 }
-

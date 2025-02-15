@@ -20,15 +20,15 @@ public class ChatRoom {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private ChatRoomType type;
 
 
-    @OneToOne()
+    @ManyToOne()
     @JoinColumn(name = "user_1", referencedColumnName = "id", nullable = true)
     private UserEntity user1;
 
-    @OneToOne()
+    @ManyToOne()
     @JoinColumn(name = "user_2", referencedColumnName = "id", nullable = true)
     private UserEntity user2;
 
