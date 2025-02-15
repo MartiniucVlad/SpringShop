@@ -8,7 +8,7 @@ public class SecurityUtil {
     public static String getSessionUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       if(!(authentication instanceof AnonymousAuthenticationToken)){
-          return authentication.getName();
+          return    authentication.getName();
       }
         return null;
     }

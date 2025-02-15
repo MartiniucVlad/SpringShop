@@ -9,6 +9,7 @@ import java.util.List;
 @Service
 public interface UserService {
 
+    UserEntity findById(Long id);
 
     void saveUser(RegistrationDto registrationDto);
     UserEntity findByEmail(String email);

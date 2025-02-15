@@ -1,7 +1,8 @@
 package com.mv.MVCP.webSocket.chatServices.impl;
 
+import com.mv.MVCP.Service.UserService;
 import com.mv.MVCP.models.UserEntity;
-import com.mv.MVCP.repository.UserRepository;
+import com.mv.MVCP.security.SecurityUtil;
 import com.mv.MVCP.webSocket.chatDomain.ChatMessage;
 import com.mv.MVCP.webSocket.chatDomain.ChatRoom;
 import com.mv.MVCP.webSocket.chatDomain.ChatRoomType;
@@ -10,12 +11,12 @@ import com.mv.MVCP.webSocket.chatRepositories.ChatMessageRepository;
 import com.mv.MVCP.webSocket.chatRepositories.ChatRoomRepository;
 import com.mv.MVCP.webSocket.chatServices.ChatRoomService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,20 +27,24 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Autowired
     private ChatMessageRepository chatMessageRepository;
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
 
+    @Override
+    public ChatRoom getChatRoom(Long roomId) {
+        return chatRoomRepository.findById(roomId).orElse(null);
+    }
 
 
     @Override
     public ChatRoom getChatRoomByUserIds(Long id1, Long id2) {
-        Optional<UserEntity> u1o = userRepository.findById(id1);
-        Optional<UserEntity> u2o = userRepository.findById(id2);
-        if (u1o.isEmpty() || u2o.isEmpty()) {
+
+        UserEntity user1 = userService.findById(id1);
+        UserEntity user2 = userService.findById(id2);
+
+        if (user1 == null || user2 == null) {
             return null;
         }
-        UserEntity user1 = u1o.get();
-        UserEntity user2 = u2o.get();
 
         if(user1.getId() > user2.getId()) {
             UserEntity temp = user1;
@@ -62,6 +67,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         room.setUser1(user1);
         room.setUser2(user2);
         room.setType(ChatRoomType.PRIVATE);
+        room.setNrUnreadUser1(0);
+        room.setNrUnreadUser2(0);
         return chatRoomRepository.save(room);
     }
 
@@ -88,13 +95,15 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public Map<Long, Long> getFriendChatRooms(Long userId) {
-        UserEntity user = userRepository.findById(userId).orElse(null);
+    public Map<Long, Pair<Long, Integer>> getFriendChatRoomsAndUnread(Long userId) {
+        UserEntity user = userService.findById(userId);
         List<ChatRoom> chatRooms = chatRoomRepository.findAllByUser1OrUser2(user, user);
+
         return chatRooms.stream()
                 .collect(Collectors.toMap(
                         room -> room.getUser1().getId().equals(userId) ? room.getUser2().getId() : room.getUser1().getId(),
-                        ChatRoom::getId
+                        room -> Pair.of(room.getId(),
+                                room.getUser1().getId().equals(userId) ? room.getNrUnreadUser1() : room.getNrUnreadUser2())
                 ));
     }
 
@@ -104,7 +113,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     ChatMessage toMessage(ChatMessageDto chatMessageDto) {
-        UserEntity user = userRepository.findById(chatMessageDto.getSenderId()).orElse(null);
+        UserEntity user = userService.findById(chatMessageDto.getSenderId());
         if (user == null) {
             throw new RuntimeException("User not found with ID: " + chatMessageDto.getSenderId());
         }
@@ -122,4 +131,33 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .build();
         return chatMessage;
     }
+
+    @Override
+    public void resetNrUnread(ChatRoom privateChat) {
+            String username = SecurityUtil.getSessionUser();
+            UserEntity currUser = userService.findByUsername(username);
+
+            if(currUser.equals(privateChat.getUser1())) {
+                privateChat.setNrUnreadUser1(0);
+            }
+            else
+                privateChat.setNrUnreadUser2(0);
+            chatRoomRepository.save(privateChat);
+        }
+
+        @Override
+        public void incrementNrUnread(Long chatId, Long senderId) {
+
+        ChatRoom chatRoom = chatRoomRepository.findById(chatId).orElse(null);
+
+        if(!senderId.equals(chatRoom.getUser1().getId())) {
+            chatRoom.setNrUnreadUser1(chatRoom.getNrUnreadUser1() + 1);
+        }
+        else
+            chatRoom.setNrUnreadUser2(chatRoom.getNrUnreadUser2() + 1);
+
+        chatRoomRepository.save(chatRoom);
+    }
+
+
 }

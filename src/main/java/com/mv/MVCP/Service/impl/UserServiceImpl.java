@@ -6,7 +6,9 @@ import com.mv.MVCP.models.RoleEntity;
 import com.mv.MVCP.models.UserEntity;
 import com.mv.MVCP.repository.RoleRepository;
 import com.mv.MVCP.repository.UserRepository;
+import com.mv.MVCP.webSocket.chatServices.ChatRoomService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +20,17 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     @Autowired
     private RoleRepository roleRepository;
+    @Lazy
+    @Autowired
+    private ChatRoomService chatRoomService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+
+    @Override
+    public UserEntity findById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
 
     @Override
     public void saveUser(RegistrationDto registrationDto) {
@@ -73,6 +84,8 @@ public class UserServiceImpl implements UserService {
 
         user1.getPartialFriendList().add(user2);
         userRepository.save(user1);
+
+        chatRoomService.createChatRoom(user1, user2);
     }
 
     @Override
@@ -91,6 +104,8 @@ public class UserServiceImpl implements UserService {
         user1.getPartialFriendList().remove(user2);
         userRepository.save(user1);
     }
+
+
 
 
 

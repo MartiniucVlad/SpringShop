@@ -41,13 +41,14 @@ document.addEventListener("DOMContentLoaded", function () {
         cell.innerText = `${friend.username}`;
 
         // Initialize unread messages for this friend
-        unreadMessages[friend.id] = 0;
+        unreadMessages[friend.id] = friend.nrUnreadUser;
 
         // Add a green dot if there are unread messages
         updateUnreadDot(friend.id, dotCell);
     }
 
     function updateUnreadDot(friendId, dotCell) {
+        console.log("updateUnreadDot frenid:  " + friendId + " nrunread "+ unreadMessages[friendId]);
         if (unreadMessages[friendId] > 0) {
             // Show green dot and the number of unread messages
             dotCell.innerHTML = `<span style="color: green;">● ${unreadMessages[friendId]}</span>`;
@@ -100,10 +101,12 @@ document.addEventListener("DOMContentLoaded", function () {
                                 showMessage(message);
                             } else {
                                 // Otherwise, increment unread messages for this friend
-                                unreadMessages[chatRoomId]++;
+
                                 let friendRow = document.querySelector(`tr[data-friend-id="${message.senderId}"]`);
                                 if (friendRow) {
-                                    updateUnreadDot(chatRoomId, friendRow.cells[1]);
+                                    let friendId = friendRow.getAttribute('data-friend-id'); // Retrieve the friend's ID
+                                    unreadMessages[friendId]++;
+                                    updateUnreadDot(friendId, friendRow.cells[1]);
                                 }
                         }
                     });
@@ -119,7 +122,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // Function to load messages for a specific chat room
     function loadMessages(messages) {
         messagesTable.innerHTML = ""; // Clear the current messages
-        messages.forEach(message => showMessage(message));
+        if(messages.length === 0) {
+            displayNoMessages();
+        }
+        else messages.forEach(message => showMessage(message));
     }
 
     // Function to wait until WebSocket is connected
@@ -167,5 +173,15 @@ document.addEventListener("DOMContentLoaded", function () {
             cell.style.fontWeight = "bold";
         }
         cell.innerText = `[${message.timestamp}] ${message.senderName}: ${message.content}`;
+
+    }
+
+    function displayNoMessages() {
+        let noMessagesRow = messagesTable.insertRow();
+        let noMessagesCell = noMessagesRow.insertCell(0);
+        noMessagesCell.colSpan = 1; // Span the cell across all columns
+        noMessagesCell.innerText = "No messages between users";
+        noMessagesCell.style.textAlign = "center"; // Center the text
+        noMessagesCell.style.fontStyle = "italic"; // Make the text italic
     }
 });

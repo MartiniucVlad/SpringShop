@@ -32,6 +32,12 @@ public class ChatRoom {
     @JoinColumn(name = "user_2", referencedColumnName = "id", nullable = true)
     private UserEntity user2;
 
+    @Column(nullable = true)
+    Integer nrUnreadUser1;
+
+    @Column(nullable = true)
+    Integer nrUnreadUser2;
+
     @PrePersist
     @PreUpdate
     private void validateUsers() {

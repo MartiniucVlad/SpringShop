@@ -9,6 +9,7 @@ import com.mv.MVCP.webSocket.chatDomain.dto.ChatMessageDto;
 import com.mv.MVCP.webSocket.chatServices.ChatRoomService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -57,13 +58,15 @@ public class ChatController {
 
 
     List<Map<String, Object>> getFriendList(UserEntity currUser) {
-        Map<Long, Long> chatRoomIds = chatRoomService.getFriendChatRooms(currUser.getId());
+        Map<Long, Pair<Long, Integer>> details = chatRoomService.getFriendChatRoomsAndUnread(currUser.getId());
         return userService.getFriendList(currUser).stream()
                 .map(friend -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("id", friend.getId());
                     map.put("username", friend.getUsername());
-                    map.put("chatRoomId", chatRoomIds.get(friend.getId())); // Get chat room ID from the preloaded map
+                    map.put("chatRoomId", details.get(friend.getId()).getFirst()); // Get chat room ID from the preloaded map
+                    map.put("nrUnreadUser", details.get(friend.getId()).getSecond()); // Get nr of unread messages
+                    System.out.println("nrUnreadUser: " + details.get(friend.getId()).getSecond());
                     return map;
                 })
                 .collect(Collectors.toList());
@@ -74,6 +77,12 @@ public class ChatController {
         String username = SecurityUtil.getSessionUser();
         UserEntity currUser = userService.findByUsername(username);
 
+//        //for testing
+//        userService.addFriend(1l, 2l);
+//        userService.addFriend(1l, 3l);
+//        userService.addFriend(3l, 2l);
+//        //
+
         Gson gson = new Gson();
         String friendListJson = gson.toJson(getFriendList(currUser));
         model.addAttribute("friendList", friendListJson);
@@ -82,8 +91,10 @@ public class ChatController {
 
     @MessageMapping("/private-chat/{chatRoomId}")
     @SendTo("/topic/private/{chatRoomId}")
-    public ChatMessageDto sendMessagePrivate(@DestinationVariable String chatRoomId, @Valid @Payload ChatMessageDto messageDto) {
+    public ChatMessageDto sendMessagePrivate(@DestinationVariable Long chatRoomId, @Valid @Payload ChatMessageDto messageDto) {
         messageDto.setTimestamp(LocalDateTime.now().format(ChatMessageDto.formatter));
+
+        chatRoomService.incrementNrUnread(chatRoomId, messageDto.getSenderId());
         chatRoomService.saveMessage(messageDto);
         return messageDto;
     }
@@ -95,6 +106,8 @@ public class ChatController {
         UserEntity currUser = userService.findByUsername(username);
 
         ChatRoom privateChat = chatRoomService.getChatRoomByUserIds(friendId, currUser.getId());
+
+        chatRoomService.resetNrUnread(privateChat);
 
         Gson gson = new Gson();
         String privateMessagesJson = gson.toJson(chatRoomService.getMessages(privateChat.getId()));
