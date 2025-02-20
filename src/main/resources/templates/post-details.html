@@ -20,7 +20,7 @@
             font-family: 'Arial', sans-serif;
         }
 
-        .product-image {
+        .postEntity-image {
             max-width: 100%;
             max-height: 500px;
             object-fit: cover;
@@ -28,7 +28,7 @@
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .product-details {
+        .postEntity-details {
             background-color: #fff;
             border-radius: 8px;
             padding: 24px;
@@ -95,19 +95,19 @@
             <div class="row gx-4 gx-lg-5 align-items-center">
                 <!-- Product Image -->
                 <div class="col-md-6">
-                    <img class="product-image" th:src="${product.photoUrl}" alt="Product Image" />
+                    <img class="postEntity-image" th:src="${post.photoUrl}" alt="Product Image" />
                 </div>
 
                 <!-- Product Details -->
                 <div class="col-md-6">
-                    <div class="product-details">
+                    <div class="postEntity-details">
                         <div class="small mb-1">SKU: BST-498</div>
-                        <h1 class="display-5 fw-bolder" th:text="${product.title}"></h1>
+                        <h1 class="display-5 fw-bolder" th:text="${post.title}"></h1>
                         <div class="fs-5 mb-4">
                             <span class="text-decoration-line-through">$45.00</span>
                             <span>$40.00</span>
                         </div>
-                        <p class="lead mb-4" th:text="${product.content}"></p>
+                        <p class="lead mb-4" th:text="${post.content}"></p>
                         <div class="d-flex align-items-center">
                             <input class="form-control me-3" id="inputQuantity" type="num" value="1" />
                             <button class="btn btn-outline-dark flex-shrink-0" type="button">
@@ -120,8 +120,8 @@
             </div>
 
             <!-- Delete Product Link -->
-            <div class="text-center mt-4" th:if="${user.id} == ${product.createdBy.id}">
-                <a th:href="@{/products/delete/{id}(id=${product.id})}" class="delete-link">Delete product</a>
+            <div class="text-center mt-4" th:if="${user.id} == ${post.createdBy.id}">
+                <a th:href="@{/posts/delete/{id}(id=${post.id})}" class="delete-link">Delete post</a>
             </div>
         </div>
     </section>

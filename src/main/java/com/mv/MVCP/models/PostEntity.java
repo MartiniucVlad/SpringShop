@@ -8,10 +8,10 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "products")
+@Table(name = "posts")
 @Getter
 @Setter
-public class Product {
+public class PostEntity {
 
 
     @Id

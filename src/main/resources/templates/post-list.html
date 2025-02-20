@@ -15,24 +15,24 @@
     <link th:href="@{/css/styles.css}" rel="stylesheet" />
     <!-- Add your custom styles -->
     <style>
-        .product-card {
+        .post-card {
             border: 1px solid #ddd;
             border-radius: 8px;
             padding: 16px;
             background-color: #f8f9fa;
             transition: transform 0.3s ease;
         }
-        .product-card:hover {
+        .post-card:hover {
             transform: scale(1.05);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
-        .product-img {
+        .post-img {
             max-width: 100%;
             max-height: 200px;
             object-fit: cover;
             border-radius: 4px;
         }
-        .product-title {
+        .post-title {
             font-size: 1.25rem;
             font-weight: 600;
             color: #343a40;
@@ -62,19 +62,19 @@
                 You are registered successfully!
             </div>
             <div>
-                <form th:action="@{/products/search}" class="form-inline my-2 my-lg-0 mb-4">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search products" aria-label="Search" name="query">
+                <form th:action="@{/posts/search}" class="form-inline my-2 my-lg-0 mb-4">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search posts" aria-label="Search" name="query">
                 </form>
             </div>
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                <div th:each="product:${products}" class="col">
-                    <div class="product-card">
-                        <img th:src="${product.getPhotoUrl()}" class="product-img" alt="Product Image">
-                        <h5 th:text="${product.title}" class="product-title"></h5>
+                <div th:each="post:${posts}" class="col">
+                    <div class="post-card">
+                        <img th:src="${post.getPhotoUrl()}" class="post-img" alt="Post Image">
+                        <h5 th:text="${post.title}" class="post-title"></h5>
                         <div class="d-flex justify-content-between align-items-center mt-3">
-                            <a th:href="@{/products/{id}(id=${product.id})}" class="btn btn-custom btn-sm">View</a>
-                            <div th:if="${user.id} == ${product.createdBy.id}">
-                                <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-custom btn-sm">Edit</a>
+                            <a th:href="@{/posts/{id}(id=${post.id})}" class="btn btn-custom btn-sm">View</a>
+                            <div th:if="${user.id} == ${post.createdBy.id}">
+                                <a th:href="@{/posts/edit/{id}(id=${post.id})}" class="btn btn-custom btn-sm">Edit</a>
                             </div>
                         </div>
                     </div>

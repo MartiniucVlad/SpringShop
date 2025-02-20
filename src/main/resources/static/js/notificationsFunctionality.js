@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // Function to create basic notification HTML
     function createBasicNotificationHTML(notif) {
         return `
-        <a class="dropdown-item d-flex align-items-start">
+        <a id="notif-${notif.id}"  class="dropdown-item d-flex align-items-start">
             <div class="me-2">
                 <i class="bi ${getNotifIcon(notif.type)} text-primary"></i>
             </div>
@@ -48,23 +48,22 @@ document.addEventListener("DOMContentLoaded", function () {
 // Function to create friend request notification HTML
     function createFriendRequestNotificationHTML(notif) {
         return `
-        <a class="dropdown-item d-flex align-items-start">
-            <div class="me-2">
-                <i class="bi ${getNotifIcon(notif.type)} text-primary"></i>
+    <a id="notif-${notif.id}" class="dropdown-item d-flex align-items-start">
+        <div class="me-2">
+            <i class="bi ${getNotifIcon(notif.type)} text-primary"></i>
+        </div>
+        <div>
+            <strong>${notif.sender_name}</strong><br>
+            <span class="text-muted small">${notif.message}</span>
+            <div class="mt-2">
+                <button class="btn btn-sm btn-success" onclick="handleFriendRequest('accept', ${notif.sender_id}, ${notif.id})">Accept</button>
+                <button class="btn btn-sm btn-danger ms-2" onclick="handleFriendRequest('reject', ${notif.sender_id}, ${notif.id})">Reject</button>
             </div>
-            <div>
-                <strong>${notif.sender_name}</strong><br>
-                <span class="text-muted small">${notif.message}</span>
-                <div class="mt-2">
-                    <button class="btn btn-sm btn-success" onclick="handleFriendRequest('accept', ${notif.sender_id})">Accept</button>
-                    <button class="btn btn-sm btn-danger ms-2" onclick="handleFriendRequest('reject', ${notif.sender_id})">Reject</button>
-                </div>
-            </div>
-        </a>
+        </div>
+    </a>
     `;
     }
 
-// Function to handle friend request accept/reject
 
 
 
@@ -85,12 +84,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
-function handleFriendRequest(action, senderId) {
-    if (action === 'accept') {
-        console.log(`Accepted friend request from ${senderId}`);
-        // Add your friend request accept logic here
-    } else if (action === 'reject') {
-        console.log(`Rejected friend request from ${senderId}`);
-        // Add your friend request reject logic here
-    }
+function handleFriendRequest(action, notif) {
+    let notifElement = document.getElementById(`notif-${notif.id}`);
+
+    fetch('/notifications/resolve-friend-notification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(notif)
+    });
+
+    notifElement.remove();
 }
+

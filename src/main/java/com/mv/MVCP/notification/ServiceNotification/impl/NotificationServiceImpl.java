@@ -41,6 +41,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         List<NotifDto> lst =  repo.findAllByRecipient(user).stream().map(
                 notif -> NotifDto.builder()
+                        .id(notif.getId())
                         .type(String.valueOf(notif.getType()))
                         .message(notif.getMessage())
                         .recipient_id(notif.getRecipient().getId())

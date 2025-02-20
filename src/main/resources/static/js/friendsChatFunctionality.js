@@ -20,8 +20,6 @@ document.addEventListener("DOMContentLoaded", function () {
         sendMessage();
     });
 
-
-
     // Load friends and subscribe to their chat rooms
 
 
@@ -45,10 +43,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Add a green dot if there are unread messages
         updateUnreadDot(friend.id, dotCell);
+
+        // Add click event to select the friend
+        newRow.addEventListener("click", function () {
+            if (selectedFriendRow) {
+                selectedFriendRow.classList.remove("selected-friend"); // Deselect previous friend
+            }
+            newRow.classList.add("selected-friend"); // Highlight selected friend
+            selectedFriendRow = newRow;
+
+            // Show the chat window
+            messagesTableContainer.style.display = "block";
+        });
     }
 
     function updateUnreadDot(friendId, dotCell) {
-        console.log("updateUnreadDot frenid:  " + friendId + " nrunread "+ unreadMessages[friendId]);
         if (unreadMessages[friendId] > 0) {
             // Show green dot and the number of unread messages
             dotCell.innerHTML = `<span style="color: green;">● ${unreadMessages[friendId]}</span>`;

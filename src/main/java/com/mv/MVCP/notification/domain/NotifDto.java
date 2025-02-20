@@ -1,9 +1,16 @@
 package com.mv.MVCP.notification.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 @Builder
+@Getter
+@Setter
 public class NotifDto {
+
+    private Long id;
 
     private Long sender_id;
 
@@ -11,9 +18,9 @@ public class NotifDto {
 
     private Long recipient_id;
 
-    String type;
+    private String type;
 
-    String message;
+    private String message;
 
     @Override
     public String toString() {

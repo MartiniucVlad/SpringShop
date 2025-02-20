@@ -1,20 +1,16 @@
 package com.mv.MVCP.dto;
 
 import com.mv.MVCP.models.UserEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
-import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 @Getter
 @Setter
-public class ProductDto {
+public class PostEntityDto {
 
     Long id;
 
@@ -24,6 +20,7 @@ public class ProductDto {
     private String photoUrl;
     @NotEmpty(message = "Content is required")
     private String content;
+
     private UserEntity createdBy;
 
 

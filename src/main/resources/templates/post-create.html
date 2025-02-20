@@ -20,7 +20,7 @@
 
     <!-- Page Content-->
     <section layout:fragment="body" class="py-5">
-        <form role="form" method="post" th:action="@{/products/create}" th:object="${productDto}">
+        <form role="form" method="post" th:action="@{/posts/create}" th:object="${postDto}">
 
             <div class="container">
 
@@ -49,7 +49,7 @@
 
                 </div>
 
-                <button type="submit" class="btn btn-primary">Create product</button>
+                <button type="submit" class="btn btn-primary">Create post</button>
 
             </div>
         </form>
