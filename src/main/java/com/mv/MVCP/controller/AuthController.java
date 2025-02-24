@@ -21,7 +21,7 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
-    @ModelAttribute("user")
+
     public UserEntity getUser () {
         UserEntity user = new UserEntity();
         String username = SecurityUtil.getSessionUser();

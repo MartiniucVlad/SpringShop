@@ -9,11 +9,16 @@ import java.util.List;
 
 public interface NotificationService {
 
+    Notif getNotifById(Long id);
 
-    void saveNotif(Notif notif);
+    void saveNotif(NotifDto notif);
 
     void deleteNotif(Long id);
 
     List<NotifDto> getNotifOfUser(UserEntity user);
+
+    Notif toNotif(NotifDto notifDto);
+
+    NotifDto toNotifDto(Notif notif);
 
 }

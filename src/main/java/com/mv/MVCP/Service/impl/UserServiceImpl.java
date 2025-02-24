@@ -2,6 +2,7 @@ package com.mv.MVCP.Service.impl;
 
 import com.mv.MVCP.Service.UserService;
 import com.mv.MVCP.dto.RegistrationDto;
+import com.mv.MVCP.dto.UserDisplayDto;
 import com.mv.MVCP.models.RoleEntity;
 import com.mv.MVCP.models.UserEntity;
 import com.mv.MVCP.repository.RoleRepository;
@@ -105,7 +106,22 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user1);
     }
 
+    @Override
+    public boolean areFriends(UserEntity u1, UserEntity u2) {
+        if(u1.getId() > u2.getId()) {
+           return u2.getPartialFriendList().contains(u1);
+        }
+        return u1.getPartialFriendList().contains(u2);
+    }
 
+    @Override
+    public UserDisplayDto toUserDisplayDto(UserEntity userEntity) {
+        return UserDisplayDto.builder()
+                .id(userEntity.getId())
+                .username(userEntity.getUsername())
+                .statusType(userEntity.getStatusType())
+                .build();
+    }
 
 
 

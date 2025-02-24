@@ -1,12 +1,42 @@
+let socketNotif = null;
+let stompClientNotif = null;
+
 document.addEventListener("DOMContentLoaded", function () {
 
     let notifIcon = document.getElementById("notif-icon");
     let notifDropdown = document.getElementById("notif-dropdown");
 
+
+    connect();
+
     notifIcon.addEventListener("click", function (event) {
         event.preventDefault();
         loadNotifications();
     });
+
+    function connect() {
+        socketNotif = new SockJS("/notifications");
+        stompClientNotif = Stomp.over(socketNotif);
+
+        stompClientNotif.connect({}, function () {
+            console.log("Connected to WebSocket for notifications");
+            subscribeToNotifications();
+        }, function (error) {
+            console.error("WebSocket connection error:", error);
+        });
+    }
+
+    function subscribeToNotifications() {
+        waitUntilConnected().then(() => {
+            let destination = `/topic2/${user.id}`;
+            stompClientNotif.subscribe(destination, function (messageOutput) {
+                let notif = JSON.parse(messageOutput.body);
+                showNotification(notif);
+            });
+        }).catch((error) => {
+            console.error(error.message);
+        });
+    }
 
     function loadNotifications() {
         notifDropdown.innerHTML = ""; // Clear previous notifications
@@ -19,7 +49,6 @@ document.addEventListener("DOMContentLoaded", function () {
         notifications.forEach((notif) => {
             let notifItem = document.createElement("li");
 
-            // Check the notification type and call corresponding function
             if (notif.type === "BASIC_NOTIFICATION") {
                 notifItem.innerHTML = createBasicNotificationHTML(notif);
             } else if (notif.type === "FRIEND_REQUEST") {
@@ -30,44 +59,50 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-// Function to create basic notification HTML
+    function showNotification(notif) {
+        let notifItem = document.createElement("li");
+
+        if (notif.type === "BASIC_NOTIFICATION") {
+            notifItem.innerHTML = createBasicNotificationHTML(notif);
+        } else if (notif.type === "FRIEND_REQUEST") {
+            notifItem.innerHTML = createFriendRequestNotificationHTML(notif);
+        }
+
+        notifDropdown.prepend(notifItem);
+    }
+
     function createBasicNotificationHTML(notif) {
         return `
-        <a id="notif-${notif.id}"  class="dropdown-item d-flex align-items-start">
-            <div class="me-2">
-                <i class="bi ${getNotifIcon(notif.type)} text-primary"></i>
-            </div>
-            <div>
-                <strong>${notif.sender_name}</strong><br>
-                <span class="text-muted small">${notif.message}</span>
-            </div>
-        </a>
-    `;
+            <a id="notif-${notif.id}" class="dropdown-item d-flex align-items-start">
+                <div class="me-2">
+                    <i class="bi ${getNotifIcon(notif.type)} text-primary"></i>
+                </div>
+                <div>
+                    <strong>${notif.sender_name}</strong><br>
+                    <span class="text-muted small">${notif.message}</span>
+                </div>
+            </a>
+        `;
     }
 
-// Function to create friend request notification HTML
     function createFriendRequestNotificationHTML(notif) {
         return `
-    <a id="notif-${notif.id}" class="dropdown-item d-flex align-items-start">
-        <div class="me-2">
-            <i class="bi ${getNotifIcon(notif.type)} text-primary"></i>
-        </div>
-        <div>
-            <strong>${notif.sender_name}</strong><br>
-            <span class="text-muted small">${notif.message}</span>
-            <div class="mt-2">
-                <button class="btn btn-sm btn-success" onclick="handleFriendRequest('accept', ${notif.sender_id}, ${notif.id})">Accept</button>
-                <button class="btn btn-sm btn-danger ms-2" onclick="handleFriendRequest('reject', ${notif.sender_id}, ${notif.id})">Reject</button>
-            </div>
-        </div>
-    </a>
-    `;
+            <a id="notif-${notif.id}" class="dropdown-item d-flex align-items-start">
+                <div class="me-2">
+                    <i class="bi ${getNotifIcon(notif.type)} text-primary"></i>
+                </div>
+                <div>
+                    <strong>${notif.sender_name}</strong><br>
+                    <span class="text-muted small">${notif.message}</span>
+                    <div class="mt-2">
+                        <button class="btn btn-sm btn-success" onclick="handleFriendRequest('accept', ${notif.sender_id}, ${notif.id})">Accept</button>
+                        <button class="btn btn-sm btn-danger ms-2" onclick="handleFriendRequest('reject', ${notif.sender_id}, ${notif.id})">Reject</button>
+                    </div>
+                </div>
+            </a>
+        `;
     }
 
-
-
-
-// Returns an icon based on notification type
     function getNotifIcon(type) {
         switch (type) {
             case "MESSAGE":
@@ -81,18 +116,40 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    function waitUntilConnected(maxAttempts = 10, interval = 100) {
+        return new Promise((resolve, reject) => {
+            let attempts = 0;
 
+            const intervalId = setInterval(() => {
+                if (stompClientNotif && stompClientNotif.connected) {
+                    clearInterval(intervalId);
+                    resolve();
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(intervalId);
+                    reject(new Error("Failed to connect after maximum attempts."));
+                } else {
+                    attempts++;
+                }
+            }, interval);
+        });
+    }
 });
 
-function handleFriendRequest(action, notif) {
-    let notifElement = document.getElementById(`notif-${notif.id}`);
+function handleFriendRequest(action, senderId, notifId) {
+    let notifElement = document.getElementById(`notif-${notifId}`);
 
-    fetch('/notifications/resolve-friend-notification', {
+    if (notifElement) {
+        // Remove the parent <li> element of the <a> element
+        let listItem = notifElement.parentElement;
+        if (listItem) {
+            listItem.remove();
+        }
+    }
+
+    fetch('/resolve-friend-notification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(notif)
-    });
+        body: JSON.stringify({ action, senderId, notifId })
+    })
 
-    notifElement.remove();
 }
-

@@ -1,6 +1,7 @@
 package com.mv.MVCP.Service;
 
 import com.mv.MVCP.dto.RegistrationDto;
+import com.mv.MVCP.dto.UserDisplayDto;
 import com.mv.MVCP.models.UserEntity;
 import org.springframework.stereotype.Service;
 
@@ -8,6 +9,8 @@ import java.util.List;
 
 @Service
 public interface UserService {
+
+
 
     UserEntity findById(Long id);
 
@@ -22,4 +25,8 @@ public interface UserService {
     void addFriend(Long userId1, Long userId2);
 
     void removeFriend(Long userId1, Long userId2);
+
+    UserDisplayDto toUserDisplayDto(UserEntity userEntity);
+
+    boolean areFriends(UserEntity u1, UserEntity u2);
 }

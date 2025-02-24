@@ -17,7 +17,6 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -57,8 +56,10 @@ public class ChatController {
         }
 
 
-    List<Map<String, Object>> getFriendList(UserEntity currUser) {
+    List<Map<String, Object>> getFriendsChatRoomList(UserEntity currUser) {
         Map<Long, Pair<Long, Integer>> details = chatRoomService.getFriendChatRoomsAndUnread(currUser.getId());
+        System.out.println(details);
+
         return userService.getFriendList(currUser).stream()
                 .map(friend -> {
                     Map<String, Object> map = new HashMap<>();
@@ -77,14 +78,9 @@ public class ChatController {
         String username = SecurityUtil.getSessionUser();
         UserEntity currUser = userService.findByUsername(username);
 
-//        //for testing
-//        userService.addFriend(1l, 2l);
-//        userService.addFriend(1l, 3l);
-//        userService.addFriend(3l, 2l);
-//        //
 
         Gson gson = new Gson();
-        String friendListJson = gson.toJson(getFriendList(currUser));
+        String friendListJson = gson.toJson(getFriendsChatRoomList(currUser));
         model.addAttribute("friendList", friendListJson);
         return "friends-chat";
     }

@@ -36,6 +36,12 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public List<PostEntityDto> findPostsByUser(UserEntity user) {
+        List<PostEntity> postEntities = postRepository.findAllByCreatedBy(user);
+        return postEntities.stream().map(this::toProductDto).toList();
+    }
+
+    @Override
     public PostEntityDto findById(Long id) {
          Optional<PostEntity> product = postRepository.findById(id);
          if(product.isPresent()) {
@@ -58,7 +64,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<PostEntityDto> searchPosts(String title) {
-        List<PostEntity> postEntities = postRepository.searchProducts(title);
+        List<PostEntity> postEntities = postRepository.searchPosts(title);
         return postEntities.stream().map(this::toProductDto).toList();
     }
 
@@ -84,6 +90,9 @@ public class PostServiceImpl implements PostService {
                 .build();
         return postEntity;
     }
+
+
+
 
 
 }

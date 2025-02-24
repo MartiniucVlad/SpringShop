@@ -4,11 +4,23 @@
 <!-- Core theme CSS (includes Bootstrap)-->
 <link th:href="@{/css/styles.css}" rel="stylesheet" />
 
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+<!-- SockJS (choose one version, we use the latest) -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+
+<!-- STOMP.js (choose one version) -->
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+
+
 <script th:src="@{/js/scripts.js}"></script>
 <script th:if="${user}" th:src="@{/js/notificationsFunctionality.js}"></script>
 <script th:inline="javascript">
     /*<![CDATA[*/
     let notifications = JSON.parse(/*[[${notifications}]]*/ '[]');
+    let user = /*[[${user}]]*/ {};
     /*]]>*/
 </script>
 
@@ -87,7 +99,8 @@
                             <!-- First Level Dropdown Items -->
                             <li th:unless="${user}" ><a class="dropdown-item" th:href="@{/register}">Register</a></li>
                             <li th:unless="${user}"  ><a class="dropdown-item" th:href="@{/login}">Login</a></li>
-                            <li th:if="${user}"  ><a class="dropdown-item not-clickable" th:text="${user.username} "></a></li>
+                            <li th:if="${user}"  ><a class="dropdown-item" th:href="@{/profile/{id}(id=${user.id})}" th:text="${user.username} "></a></li>
+                            <li th:if="${user}"  ><a class="dropdown-item" th:href="@{/friend-list}">Friend List</a></li>
 
                             <li th:if="${user}" class="dropdown-submenu parent">
                                 <a id="user-status" class="dropdown-item" th:text="'Status: ' + ${user.statusType}" href="#"></a>

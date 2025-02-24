@@ -63,6 +63,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     // user1.id must already be > than user2.id
     @Override
     public ChatRoom createChatRoom(UserEntity user1, UserEntity user2) {
+        if(getChatRoomByUserIds(user1.getId(), user2.getId()) != null) {
+            return null;
+        }
+
         ChatRoom room = new ChatRoom();
         room.setUser1(user1);
         room.setUser2(user2);

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="" />
+  <meta name="author" content="" />
+  <title>Friends & Chat</title>
+  <!-- Favicon-->
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <script th:src="@{/js/friendListFunctionality.js}"></script>
+
+  <!-- Custom Styles -->
+  <style>
+    .friend-list-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .friend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between; /* Align name to left and button to right */
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      position: relative; /* Ensure button stays aligned */
+    }
+
+    .friend-item:last-child {
+      border-bottom: none;
+    }
+    .friend-info {
+      display: flex;
+      align-items: center;
+    }
+    .friend-username {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #333;
+      text-decoration: none;
+    }
+    .friend-username:hover {
+      text-decoration: underline;
+    }
+    .unfriend-btn {
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .unfriend-btn:hover {
+      background-color: #cc0000;
+    }
+  </style>
+</head>
+<body class="d-flex flex-column h-100">
+<main class="flex-shrink-0">
+  <!-- Navigation-->
+
+  <!-- Page Content-->
+  <section layout:fragment="body" class="py-5">
+    <noscript>
+      <h2 style="color: #c91c1c">Seems your browser doesn't support Javascript! Websocket relies on Javascript being enabled. Please enable Javascript and reload this page!</h2>
+    </noscript>
+
+    <div class="friend-list-container">
+      <h2 class="mb-4 text-center">Your Friends</h2>
+      <div th:each="friend : ${friendList}" class="friend-item border rounded p-3 mb-2 shadow-sm">
+        <div class="d-flex align-items-center w-100">
+          <a th:href="@{/profile/{id}(id=${friend.id})}" class="text-decoration-none text-dark flex-grow-1">
+            <span class="friend-username" th:text="${friend.username}"></span>
+          </a>
+          <button class="unfriend-btn ms-3" th:data-friend-id="${friend.id}">Unfriend</button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Custom JS -->
+<script>
+
+  function removeFriend(button) {
+    const friendId = button.getAttribute('data-friend-id');
+
+    fetch('/remove-friend', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(friendId)
+    })
+            .then(response => {
+              if (response.ok) {
+                // Remove the friend item from the DOM
+                button.closest('.friend-item').remove();
+                alert('Friend removed successfully!');
+              } else {
+                alert('Failed to remove friend.');
+              }
+            })
+            .catch(error => {
+              console.error('Error removing friend:', error);
+            });
+  }
+</script>
+</body>
+</html>

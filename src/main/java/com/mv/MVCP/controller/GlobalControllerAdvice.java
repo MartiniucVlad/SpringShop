@@ -1,6 +1,7 @@
 package com.mv.MVCP.controller;
 
 import com.google.gson.Gson;
+import com.mv.MVCP.dto.UserDisplayDto;
 import com.mv.MVCP.models.UserEntity;
 import com.mv.MVCP.Service.UserService;
 import com.mv.MVCP.notification.ServiceNotification.NotificationService;
@@ -18,10 +19,10 @@ public class GlobalControllerAdvice {
     private NotificationService notifService;
 
     @ModelAttribute("user")
-    public UserEntity addUserToModel() {
+    public UserDisplayDto addUserToModel() {
         String username = SecurityUtil.getSessionUser();
         if (username != null) {
-            return userService.findByUsername(username);
+            return userService.toUserDisplayDto(userService.findByUsername(username));
         }
         return null;
     }

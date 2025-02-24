@@ -12,6 +12,7 @@ public class NotifDto {
 
     private Long id;
 
+
     private Long sender_id;
 
     private String sender_name;

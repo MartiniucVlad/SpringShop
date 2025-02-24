@@ -30,6 +30,8 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    let selectedFriendRow = null;
+
     function showFriend(friend) {
         let newRow = friendsTable.insertRow();
         let cell = newRow.insertCell(0);
@@ -52,8 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
             newRow.classList.add("selected-friend"); // Highlight selected friend
             selectedFriendRow = newRow;
 
-            // Show the chat window
-            messagesTableContainer.style.display = "block";
+
         });
     }
 

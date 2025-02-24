@@ -3,9 +3,10 @@ package com.mv.MVCP.controller;
 import com.mv.MVCP.Service.PostService;
 import com.mv.MVCP.Service.UserService;
 import com.mv.MVCP.dto.PostEntityDto;
+import com.mv.MVCP.models.UserEntity;
+import com.mv.MVCP.security.SecurityUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,10 +21,16 @@ public class PostController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/test")
-    public String test() {
-        return "test";
+    public UserEntity getCurrUser () {
+        UserEntity user = new UserEntity();
+        String username = SecurityUtil.getSessionUser();
+        if(username != null) {
+            user = userService.findByUsername(username);
+            return user;
+        }
+        return null;
     }
+
 
     @GetMapping("/posts")
     public String posts(Model model) {
@@ -61,8 +68,6 @@ public class PostController {
 
     @GetMapping("/posts/delete/{id}")
     public String deletePost(@PathVariable("id") Long id) {
-        var roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        System.out.println("User Roles: " + roles); // Debug: Print user roles
         postService.deletePost(id);
         return "redirect:/posts";
     }
@@ -95,4 +100,7 @@ public class PostController {
         model.addAttribute("posts", posts);
         return "post-list";
     }
+
+
+
 }
